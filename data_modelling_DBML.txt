@@ -1,0 +1,73 @@
+Table produtos {
+  id_produto    integer [primary key]
+  nome          varchar(255)
+  descricao     text
+  preco         decimal(10,2)
+  estoque_atual integer
+}
+
+Table ingredientes {
+  id_ingrediente integer [primary key]
+  nome           varchar(255)
+}
+
+Table produtos_ingredientes {
+  id_produto     integer [ref: > produtos.id_produto]
+  id_ingrediente integer [ref: > ingredientes.id_ingrediente]
+  quantidade     decimal(10,2) // Quantidade necessária para produzir uma unidade do produto
+  primary key (id_produto, id_ingrediente)
+}
+
+Table estoque_produtos {
+  id_estoque_produto integer [primary key]
+  id_produto         integer [ref: > produtos.id_produto]
+  quantidade         integer
+  data_atualizacao   date
+}
+
+Table estoque_ingredientes {
+  id_estoque_ingrediente integer [primary key]
+  id_ingrediente         integer [ref: > ingredientes.id_ingrediente]
+  quantidade             integer
+  data_atualizacao       date
+}
+
+Table compras_ingredientes {
+  id_compra_ingrediente integer [primary key]
+  id_ingrediente        integer [ref: > ingredientes.id_ingrediente]
+  quantidade            integer
+  preco_unitario        decimal(10,2) // Preço pago pelo ingrediente nesta compra
+  data_compra           date
+}
+
+Table clientes {
+  id_cliente  integer [primary key]
+  nome        varchar(255)
+  telefone    varchar(20)
+  email       varchar(255)
+  endereco    text
+}
+
+Table data {
+  data_id     integer [primary key]
+  data_completa date
+  ano         integer
+  mes         integer
+  dia         integer
+}
+
+Table vendas {
+  id_venda     integer [primary key]
+  id_cliente   integer [ref: > clientes.id_cliente]
+  data_id      integer [ref: > data.data_id]
+  total_venda  decimal(10,2)
+}
+
+Table vendas_produtos {
+  id_venda     integer [ref: > vendas.id_venda]
+  id_produto   integer [ref: > produtos.id_produto]
+  quantidade   integer
+  preco_unitario decimal(10,2)
+  primary key (id_venda, id_produto)
+}
+
