@@ -1,73 +1,62 @@
-Table produtos {
-  id_produto    integer [primary key]
-  nome          varchar(255)
-  descricao     text
-  preco         decimal(10,2)
-  estoque_atual integer
-}
-
-Table ingredientes {
-  id_ingrediente integer [primary key]
-  nome           varchar(255)
-}
-
-Table produtos_ingredientes {
-  id_produto     integer [ref: > produtos.id_produto]
-  id_ingrediente integer [ref: > ingredientes.id_ingrediente]
-  quantidade     decimal(10,2) // Quantidade necessária para produzir uma unidade do produto
-  primary key (id_produto, id_ingrediente)
-}
-
-Table estoque_produtos {
-  id_estoque_produto integer [primary key]
-  id_produto         integer [ref: > produtos.id_produto]
-  quantidade         integer
-  data_atualizacao   date
-}
-
-Table estoque_ingredientes {
-  id_estoque_ingrediente integer [primary key]
-  id_ingrediente         integer [ref: > ingredientes.id_ingrediente]
-  quantidade             integer
-  data_atualizacao       date
-}
-
-Table compras_ingredientes {
-  id_compra_ingrediente integer [primary key]
-  id_ingrediente        integer [ref: > ingredientes.id_ingrediente]
-  quantidade            integer
-  preco_unitario        decimal(10,2) // Preço pago pelo ingrediente nesta compra
-  data_compra           date
+Project "Sistema de Vendas" {
+  database_type: "PostgreSQL"
 }
 
 Table clientes {
-  id_cliente  integer [primary key]
-  nome        varchar(255)
-  telefone    varchar(20)
-  email       varchar(255)
-  endereco    text
+  cliente_id int [pk, increment]
+  tipo_pessoa varchar(20) [not null] // Ex: Física ou Jurídica
+  documento varchar(20) [not null, unique] // CPF ou CNPJ
+  nome varchar(100) [not null]
+  email varchar(100)
+  endereco text
+
+  Note: "Cadastro de clientes."
 }
 
-Table data {
-  data_id     integer [primary key]
-  data_completa date
-  ano         integer
-  mes         integer
-  dia         integer
+Table produtos {
+  produto_id int [pk, increment]
+  nome varchar(100) [not null]
+  descricao text
+  categoria varchar(50)
+  preco_unitario decimal(10,2) [not null]
+  peso_gramas int
+  data_criacao date [not null, default: `now()`]
+  status boolean [not null, default: true]
+
+  Note: "Tabela de produtos disponíveis para venda."
+}
+
+Table estoque {
+  estoque_id int [pk, increment]
+  produto_id int [ref: > produtos.produto_id, not null]
+  quantidade int [not null]
+  lote varchar(50)
+  data_producao date
+  data_validade date
+  localizacao varchar(50)
+  data_atualizacao timestamp [not null, default: `now()`]
+
+  Note: "Controle do estoque de produtos."
 }
 
 Table vendas {
-  id_venda     integer [primary key]
-  id_cliente   integer [ref: > clientes.id_cliente]
-  data_id      integer [ref: > data.data_id]
-  total_venda  decimal(10,2)
+  venda_id int [pk, increment]
+  data_venda timestamp [not null, default: `now()`]
+  cliente_id int [ref: > clientes.cliente_id, not null]
+  valor_total decimal(10,2) [not null]
+  metodo_pagamento varchar(50)
+  status_venda varchar(30) [not null, default: 'Pendente']
+
+  Note: "Registro de vendas realizadas."
 }
 
-Table vendas_produtos {
-  id_venda     integer [ref: > vendas.id_venda]
-  id_produto   integer [ref: > produtos.id_produto]
-  quantidade   integer
-  preco_unitario decimal(10,2)
-  primary key (id_venda, id_produto)
-}
+Table itens_venda {
+  item_id int [pk, increment]
+  venda_id int [ref: > vendas.venda_id, not null]
+  produto_id int [ref: > produtos.produto_id, not null]
+  quantidade int [not null]
+  preco_unitario decimal(10,2) [not null]
+  subtotal decimal(10,2) [not null]
 
+  Note: "Itens que compõem cada venda."
+}
