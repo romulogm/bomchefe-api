@@ -1,15 +1,18 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from app.database import engine, Base
-from app.routers import clientes, produtos
+from app.routers import clientes, produtos, estoque
 from fastapi.responses import HTMLResponse
 from jinja2 import Template
-app = FastAPI()
+from app.utils.auth import verify_token
+
+app = FastAPI(dependencies=[Depends(verify_token)])
 
 # Criar as tabelas no banco
 Base.metadata.create_all(bind=engine)
 
 app.include_router(clientes.router)
 app.include_router(produtos.router)
+app.include_router(estoque.router)
 
 # Template HTML para a página inicial
 TEMPLATE_HTML = """

@@ -9,3 +9,6 @@ Command to API:
 docker-compose exec -it bomchefe-api alembic upgrade head
 
 admin / bomchefe
+
+
+alembic revision --autogenerate -m "Create produtos table"

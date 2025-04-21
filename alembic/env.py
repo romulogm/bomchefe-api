@@ -5,7 +5,7 @@ from sqlalchemy import pool
 from alembic import context
 from app.models.produtos import Produto
 from app.models.clientes import Cliente
-
+from app.models.clientes import Estoque
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
