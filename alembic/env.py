@@ -3,9 +3,8 @@ from app.database import Base
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
-from app.models.produtos import Produto
-from app.models.clientes import Cliente
-from app.models.clientes import Estoque
+from app.models import Produto, Cliente, Estoque, Venda, ItemVenda
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

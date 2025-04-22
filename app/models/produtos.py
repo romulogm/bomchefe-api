@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text, Numeric, Boolean, Date
+from sqlalchemy import Column, Integer, String, Text, Date, Boolean
+from sqlalchemy.types import DECIMAL
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 class Produto(Base):
@@ -8,7 +10,10 @@ class Produto(Base):
     nome = Column(String(100), nullable=False)
     descricao = Column(Text)
     categoria = Column(String(50))
-    preco_unitario = Column(Numeric(10, 2), nullable=False)
+    preco_unitario = Column(DECIMAL(10, 2), nullable=False)
     peso_gramas = Column(Integer)
     data_criacao = Column(Date, nullable=False)
-    status = Column(Boolean, default=True, nullable=False)
+    status = Column(Boolean, nullable=False, default=True)
+
+    # Relacionamento com Estoque
+    estoque = relationship("Estoque", back_populates="produto")

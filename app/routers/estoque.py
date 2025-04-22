@@ -1,40 +1,35 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
-from app import schemas, crud
-from app.schemas import estoque
+from app import crud, schemas, models
 from app.database import get_db
 
-router = APIRouter(
-    prefix="/estoque",
-    tags=["Estoque"]
-)
+router = APIRouter()
 
-@router.post("/", response_model=schemas.estoque.Estoque)
-def create_estoque(estoque: schemas.estoque.EstoqueCreate, db: Session = Depends(get_db)):
-    return crud.crud_estoque.create_estoque(db, estoque)
+@router.get("/", response_model=list[schemas.Estoque])
+def get_estoques(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
+    return crud.get_estoques(db=db, skip=skip, limit=limit)
 
-@router.get("/", response_model=List[schemas.estoque.Estoque])
-def read_estoques(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return crud.crud_estoque.get_estoques(db, skip=skip, limit=limit)
+@router.get("/{estoque_id}", response_model=schemas.Estoque)
+def get_estoque(estoque_id: int, db: Session = Depends(get_db)):
+    return crud.get_estoque(db=db, estoque_id=estoque_id)
 
-@router.get("/{estoque_id}", response_model=schemas.estoque.Estoque)
-def read_estoque(estoque_id: int, db: Session = Depends(get_db)):
-    db_estoque = crud.crud_estoque.get_estoque(db, estoque_id)
-    if db_estoque is None:
-        raise HTTPException(status_code=404, detail="Estoque não encontrado")
-    return db_estoque
+@router.post("/", response_model=schemas.Estoque)
+def create_estoque(estoque: schemas.EstoqueCreate, db: Session = Depends(get_db)):
+    return crud.create_estoque(db=db, estoque=estoque)
 
-@router.put("/{estoque_id}", response_model=schemas.estoque.Estoque)
-def update_estoque(estoque_id: int, estoque: schemas.estoque.EstoqueCreate, db: Session = Depends(get_db)):
-    db_estoque = crud.crud_estoque.update_estoque(db, estoque_id, estoque)
-    if db_estoque is None:
-        raise HTTPException(status_code=404, detail="Estoque não encontrado")
-    return db_estoque
+@router.put("/{estoque_id}", response_model=schemas.Estoque)
+def update_estoque(estoque_id: int, estoque: schemas.EstoqueCreate, db: Session = Depends(get_db)):
+    return crud.update_estoque(db=db, estoque_id=estoque_id, estoque=estoque)
 
-@router.delete("/{estoque_id}")
+@router.delete("/{estoque_id}", response_model=schemas.Estoque)
 def delete_estoque(estoque_id: int, db: Session = Depends(get_db)):
-    db_estoque = crud.crud_estoque.delete_estoque(db, estoque_id)
-    if db_estoque is None:
-        raise HTTPException(status_code=404, detail="Estoque não encontrado")
-    return {"message": "Estoque removido com sucesso"}
+    return crud.delete_estoque(db=db, estoque_id=estoque_id)
+
+@router.get("/produto/{produto_id}", response_model=list[schemas.estoque.Estoque])
+def list_estoque_by_produto(produto_id: int, db: Session = Depends(get_db)):
+    estoque = db.query(models.Estoque).filter(models.Estoque.produto_id == produto_id).all()
+
+    if not estoque:
+        raise HTTPException(status_code=404, detail="Nenhum estoque encontrado para este produto.")
+
+    return estoque

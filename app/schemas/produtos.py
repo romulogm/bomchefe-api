@@ -1,24 +1,21 @@
 from pydantic import BaseModel
-from typing import Optional
+from decimal import Decimal
 from datetime import date
 
 class ProdutoBase(BaseModel):
     nome: str
-    descricao: Optional[str] = None
-    categoria: Optional[str] = None
-    preco_unitario: float
-    peso_gramas: Optional[int] = None
-    status: Optional[bool] = True
+    descricao: str = None
+    categoria: str = None
+    preco_unitario: Decimal
+    peso_gramas: int = None
+    data_criacao: date
+    status: bool
 
 class ProdutoCreate(ProdutoBase):
     pass
 
-class ProdutoUpdate(ProdutoBase):
-    pass
-
-class ProdutoOut(ProdutoBase):
+class Produto(ProdutoBase):
     produto_id: int
-    data_criacao: date
 
     class Config:
         orm_mode = True

@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, TIMESTAMP, func
+from sqlalchemy import Column, Integer, ForeignKey, String, Date, DateTime
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 class Estoque(Base):
@@ -11,4 +12,7 @@ class Estoque(Base):
     data_producao = Column(Date)
     data_validade = Column(Date)
     localizacao = Column(String(50))
-    data_atualizacao = Column(TIMESTAMP, server_default=func.now(), nullable=False)
+    data_atualizacao = Column(DateTime, nullable=False)
+
+    # Relacionamento com Produto
+    produto = relationship("Produto", back_populates="estoque")

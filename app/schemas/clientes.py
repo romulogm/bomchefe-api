@@ -11,10 +11,7 @@ class ClienteBase(BaseModel):
 class ClienteCreate(ClienteBase):
     pass
 
-class ClienteUpdate(ClienteBase):
-    pass
-
-class ClienteOut(ClienteBase):
+class Cliente(ClienteBase):
     cliente_id: int
 
     class Config:
