@@ -1,14 +1,49 @@
+# 🍪 Biscoitos Bom Chefe – Sistema de Gestão
+
+Sistema de gestão interna da empresa **Biscoitos Bom Chefe**, desenvolvido com **FastAPI** e **PostgreSQL**, rodando em containers via **Docker Compose**.
+
+---
+
+## 📦 Requisitos
+
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+---
+
+## 🚀 Como rodar o projeto
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/seu-usuario/seu-repositorio.git
+cd seu-repositorio
+
+### 2. Suba os containers
+
+docker-compose up --build
+
+### 3. Acesse a aplicação
+
+http://localhost:8000/
+http://localhost:8000/docs
+
+
+
+### Notes
+
 docker exec -it bomchefe-db psql -U admin -l
 
 docker exec -it nome_do_container_db bash
 
 Connect to DB: 
-docker exec -it bomchefe-db psql -h db -U admin -d bomchefe_db -p 5432
+docker exec -it bomchefe-db \dt
 
 Command to API: 
 docker-compose exec -it bomchefe-api alembic upgrade head
 
 admin / bomchefe
 
-
-alembic revision --autogenerate -m "Create produtos table"
+Migration:
+alembic revision --autogenerate -m "Create tables"
+alembic upgrade head
