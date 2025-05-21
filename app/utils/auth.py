@@ -6,6 +6,8 @@ load_dotenv()
 
 API_TOKEN = os.getenv("API_TOKEN")
 
+print(API_TOKEN)
+
 # Dependência para validar o token
 def verify_token(x_token: str = Header(...)):
     if x_token != API_TOKEN:
