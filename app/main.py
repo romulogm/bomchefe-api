@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from app.database import engine, Base
-from app.routers import clientes, produtos, estoque, vendas
+from app.routers import clientes, produtos, estoque, vendas, feiras
 from fastapi.responses import HTMLResponse
 from jinja2 import Template
 from app.utils.auth import verify_token
@@ -15,6 +15,7 @@ app.include_router(clientes.router, prefix="/clientes", tags=["Clientes"])
 app.include_router(produtos.router, prefix="/produtos", tags=["Produtos"])
 app.include_router(estoque.router, prefix="/estoques", tags=["Estoques"])
 app.include_router(vendas.router, prefix="/vendas", tags=["Vendas"])
+app.include_router(feiras.router, prefix="/feiras", tags=["Feiras"])
 
 # Template HTML para a página inicial
 TEMPLATE_HTML = """

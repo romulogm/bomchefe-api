@@ -29,3 +29,11 @@ from .vendas import (
     update_venda,
     delete_venda,
 )
+
+from .feiras import (
+    get_feira,
+    get_feira_by_name,
+    create_feira,
+    update_feira,
+    delete_feira,
+)

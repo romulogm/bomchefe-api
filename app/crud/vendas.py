@@ -10,20 +10,32 @@ def get_venda(db: Session, venda_id: int):
     return db.query(Venda).filter(Venda.venda_id == venda_id).first()
 
 def create_venda(db: Session, venda: VendaCreate):
-    db_venda = Venda(**venda.dict())
+    """
+    Cria uma nova venda e seus itens associados no banco de dados.
+    O campo 'feira_id' é opcional e será incluído se presente no objeto 'venda'.
+    """
+    
+    db_venda = Venda(**venda.dict(exclude={'itens_venda'})) 
+    
     db.add(db_venda)
+    db.commit() 
+    db.refresh(db_venda) 
+
+    
+    for item_data in venda.itens_venda:
+      
+        db_item_venda = ItemVenda(
+            venda_id=db_venda.venda_id,
+            produto_id=item_data.produto_id,
+            quantidade=item_data.quantidade,
+            preco_unitario=item_data.preco_unitario,
+            subtotal=item_data.subtotal 
+        )
+        db.add(db_item_venda)
+    
     db.commit()
     db.refresh(db_venda)
-    for item in venda.itens_venda:
-        item_venda = ItemVenda(
-            venda_id=db_venda.venda_id,
-            produto_id=item.produto_id,
-            quantidade=item.quantidade,
-            preco_unitario=item.preco_unitario,
-            subtotal=item.subtotal
-        )
-        db.add(item_venda)
-    db.commit()
+
     return db_venda
 
 def update_venda(db: Session, venda_id: int, venda: VendaCreate):

@@ -13,5 +13,10 @@ class Venda(Base):
     metodo_pagamento = Column(String(50))
     status_venda = Column(String(30), nullable=False, default='Pendente')
 
+    feira_id = Column(Integer, ForeignKey("feiras.feira_id"), nullable=True, index=True)
+    feira = relationship("Feira", back_populates="vendas")
     cliente = relationship("Cliente", back_populates="vendas")
     itens_venda = relationship("ItemVenda", back_populates="venda", cascade="all, delete-orphan")
+
+
+
