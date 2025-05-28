@@ -5,10 +5,7 @@ from typing import List
 from .. import crud, schemas
 from ..database import get_db
 
-router = APIRouter(
-    prefix="/feiras",  
-    tags=["Feiras"]    
-)
+router = APIRouter()
 
 @router.post("/", response_model=schemas.Feira, status_code=status.HTTP_201_CREATED)
 def create_feira(feira: schemas.FeiraCreate, db: Session = Depends(get_db)):
