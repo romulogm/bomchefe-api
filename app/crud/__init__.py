@@ -34,6 +34,7 @@ from .feiras import (
     get_feira,
     get_feira_by_name,
     create_feira,
+    get_feiras,
     update_feira,
     delete_feira,
 )
