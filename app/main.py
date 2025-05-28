@@ -4,8 +4,22 @@ from app.routers import clientes, produtos, estoque, vendas, feiras
 from fastapi.responses import HTMLResponse
 from jinja2 import Template
 from app.utils.auth import verify_token
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(dependencies=[Depends(verify_token)])
+
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins, 
+    allow_credentials=True, 
+    allow_methods=["*"],    
+    allow_headers=["*"],   
+)
 
 # Criar as tabelas no banco
 Base.metadata.create_all(bind=engine)

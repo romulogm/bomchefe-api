@@ -1,7 +1,7 @@
 import requests
 
 # URL da API e token
-URL = "http://localhost:8000/produtos/"
+URL = "http://132.145.184.44:8000/produtos/"
 TOKEN = "AhuAk87&%&Ajha%ahga$2851S6hdma"
 
 # Lista de produtos (adicione os seus objetos aqui)
@@ -13,7 +13,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Rosquinha da Mamãe",
@@ -22,7 +22,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Aveinha",
@@ -31,7 +31,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Queijadinha",
@@ -40,7 +40,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Palito de Limão",
@@ -49,7 +49,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Rosca de Coco",
@@ -58,7 +58,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Casadinho Goiabinha",
@@ -67,7 +67,7 @@ produtos = [
       "preco_unitario": 60.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Gravatinha Goiabinha",
@@ -76,7 +76,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Beijinho de Freira",
@@ -85,7 +85,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Trancinha de Laranja",
@@ -94,7 +94,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Medalhão Tradicional",
@@ -103,7 +103,7 @@ produtos = [
       "preco_unitario": 84.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Argolinha de Parmesão",
@@ -112,7 +112,7 @@ produtos = [
       "preco_unitario": 84.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Argolinha de Chia",
@@ -121,7 +121,7 @@ produtos = [
       "preco_unitario": 84.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Palitinho de Pimenta",
@@ -130,7 +130,7 @@ produtos = [
       "preco_unitario": 84.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Vaidosa",
@@ -139,7 +139,7 @@ produtos = [
       "preco_unitario": 78.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Biscoito de Amendoim",
@@ -148,7 +148,7 @@ produtos = [
       "preco_unitario": 78.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Biscoito de Milho",
@@ -157,7 +157,7 @@ produtos = [
       "preco_unitario": 78.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Torradinha de Alho",
@@ -166,7 +166,7 @@ produtos = [
       "preco_unitario": 78.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Champanhota de Canela",
@@ -175,7 +175,7 @@ produtos = [
       "preco_unitario": 78.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Quebra Quebra de Coco",
@@ -184,7 +184,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Rosquinha de Leite Condensado",
@@ -193,7 +193,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Biscoito de Natinha",
@@ -202,7 +202,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Biscoito de Natinha c/ Granulado de Chocolate",
@@ -211,7 +211,7 @@ produtos = [
       "preco_unitario": 56.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
+      "status": True
     },
     {
       "nome": "Pimentinha Mexicana",
@@ -220,8 +220,8 @@ produtos = [
       "preco_unitario": 46.00,
       "peso_gramas": 1000,
       "data_criacao": "2025-05-18",
-      "status": true
-    }
+      "status": True
+    },
     {
         "nome": "Biscoito de Natinha c/ Granulado de Chocolate",
         "descricao": "Produto com custo de R$24,00 por KG. Venda semanal: 1 KG.",

@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 
-API_BASE_URL = "http://localhost:8000"
+API_BASE_URL = "http://132.145.184.44:8000"
 API_TOKEN = "AhuAk87&%&Ajha%ahga$2851S6hdma"
 
 headers = {
@@ -49,7 +49,7 @@ def criar_estoque(produto_id):
 
     try:
         response = requests.post(f"{API_BASE_URL}/estoques/", json=payload, headers=headers)
-        if response.status_code == 201:
+        if response.status_code == 200:
             print(f"✅ Estoque criado para produto_id={produto_id}")
         else:
             print(f"❌ Erro ao criar estoque para produto_id={produto_id}: {response.status_code} - {response.text}")

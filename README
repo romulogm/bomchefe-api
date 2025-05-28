@@ -47,3 +47,7 @@ admin / bomchefe
 Migration:
 alembic revision --autogenerate -m "Create tables"
 alembic upgrade head
+
+
+##
+ssh -i ssh-key-2025-05-27.key ubuntu@132.145.184.44
