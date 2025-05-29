@@ -58,7 +58,7 @@ from app.models import Venda, ItemVenda, Feira, Produto # Certifique-se de impor
 from app.schemas import VendaCreate, Venda # Importe o schema Venda para tipagem de retorno
 
 # Importe os schemas de ItemVenda e Feira também, se forem usados diretamente aqui
-from app.schemas import ItemVenda # Assumindo que ItemVendaBase e ItemVenda estão em schemas/venda.py
+from app.schemas import ItemVendaBase # Assumindo que ItemVendaBase e ItemVenda estão em schemas/venda.py
 from app.schemas import Feira as FeiraSchema # Importe o schema Feira como FeiraSchema para evitar conflito de nome
 
 def get_vendas(db: Session, skip: int = 0, limit: int = 100):
