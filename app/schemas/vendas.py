@@ -12,6 +12,8 @@ class ItemVendaBase(BaseModel):
     
     model_config = ConfigDict(from_attributes=True)
 
+
+
 class VendaBase(BaseModel):
     cliente_id: int
     valor_total: Decimal
@@ -20,6 +22,7 @@ class VendaBase(BaseModel):
     feira_id: Optional[int] = None
 
 class VendaCreate(VendaBase):
+    itens_venda: List[ItemVendaBase] = [] 
     pass
 
 class Venda(VendaBase):

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import date, datetime
 from typing import Optional
+from .produtos import Produto
 
 class EstoqueBase(BaseModel):
     produto_id: int
@@ -16,5 +17,5 @@ class EstoqueCreate(EstoqueBase):
 
 class Estoque(EstoqueBase):
     estoque_id: int
-
+    produto: Optional[Produto] = None 
     model_config = ConfigDict(from_attributes=True)
