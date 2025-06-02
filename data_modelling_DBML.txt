@@ -10,7 +10,7 @@ Table clientes {
   email varchar(100)
   endereco text
 
-  Note: "Cadastro de clientes."
+  Note: "Cadastro de clientes.'
 }
 
 Table produtos {

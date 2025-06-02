@@ -4,3 +4,4 @@ from .estoque import Estoque
 from .vendas import Venda
 from .itens_venda import ItemVenda
 from .feiras import Feira
+from .movimentacao_estoque import MovimentacaoEstoque

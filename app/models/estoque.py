@@ -4,7 +4,7 @@ from app.database import Base
 
 class Estoque(Base):
     __tablename__ = "estoque"
-
+    feira_id = Column(Integer, ForeignKey("feiras.feira_id"), nullable=True)
     estoque_id = Column(Integer, primary_key=True, index=True)
     produto_id = Column(Integer, ForeignKey("produtos.produto_id"), nullable=False)
     quantidade = Column(Integer, nullable=False)
@@ -14,5 +14,7 @@ class Estoque(Base):
     localizacao = Column(String(50))
     data_atualizacao = Column(DateTime, nullable=False)
 
-    # Relacionamento com Produto
+    # Relacionamento
+    movimentacoes_estoque = relationship("MovimentacaoEstoque", back_populates="estoque")
     produto = relationship("Produto", back_populates="estoque")
+    feira = relationship("Feira", back_populates="itens_de_estoque")

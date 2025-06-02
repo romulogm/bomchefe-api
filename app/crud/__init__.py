@@ -37,4 +37,9 @@ from .feiras import (
     get_feiras,
     update_feira,
     delete_feira,
+    get_feira_by_name_and_date,
+)
+
+from .movimentacao_estoque import (
+    create_movimentacao_estoque,
 )

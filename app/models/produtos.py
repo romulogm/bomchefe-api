@@ -17,3 +17,8 @@ class Produto(Base):
 
     # Relacionamento com Estoque
     estoque = relationship("Estoque", back_populates="produto")
+    movimentacoes_estoque = relationship(
+        "MovimentacaoEstoque", 
+        back_populates="produto"
+    )
+ 
