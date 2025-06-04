@@ -8,10 +8,9 @@ class Venda(Base):
 
     venda_id = Column(Integer, primary_key=True, index=True)
     data_venda = Column(DateTime, nullable=False, default=datetime.utcnow)
-    cliente_id = Column(Integer, ForeignKey("clientes.cliente_id"), nullable=False)
+    cliente_id = Column(Integer, ForeignKey("clientes.cliente_id"), nullable=True)
     valor_total = Column(Numeric(10, 2), nullable=False)
-    metodo_pagamento = Column(String(50))
-    status_venda = Column(String(30), nullable=False, default='Pendente')
+    status_venda = Column(String(30), nullable=False, default='Concluída')
 
     feira_id = Column(Integer, ForeignKey("feiras.feira_id"), nullable=True, index=True)
     feira = relationship("Feira", back_populates="vendas")

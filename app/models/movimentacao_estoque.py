@@ -16,7 +16,7 @@ class MovimentacaoEstoque(Base):
     # 'VENDA_EM_FEIRA', 'RETORNO_DE_FEIRA_SAIDA', 'RETORNO_DE_FEIRA_ENTRADA', 'AJUSTE_ESTOQUE'
     feira_id = Column(Integer, ForeignKey("feiras.feira_id"), nullable=True) # If related to a fair operation
     venda_id = Column(Integer, ForeignKey("vendas.venda_id"), nullable=True) # If related to a sale depletion
-    item_venda_id = Column(Integer, ForeignKey("itens_venda.item_id"), nullable=True) # If related to a specific sale item
+    item_venda_id = Column(Integer, ForeignKey("itens_venda.item_venda_id"), nullable=True) # If related to a specific sale item
     observacao = Column(Text, nullable=True)
 
     produto = relationship("Produto", back_populates="movimentacoes_estoque")

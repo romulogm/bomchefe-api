@@ -15,7 +15,7 @@ def get_venda(venda_id: int, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=schemas.Venda)
 def create_venda(venda: schemas.VendaCreate, db: Session = Depends(get_db)):
-    return crud.create_venda(db=db, venda=venda)
+    return crud.create_venda(db=db, venda_data=venda)
 
 @router.put("/{venda_id}", response_model=schemas.Venda)
 def update_venda(venda_id: int, venda: schemas.VendaCreate, db: Session = Depends(get_db)):
@@ -52,10 +52,10 @@ def create_item_venda(venda_id: int, item: schemas.itens_venda.ItemVendaCreate, 
     return item
 
 
-@router.put("/{venda_id}/itens/{item_id}")
-def update_item_venda(venda_id: int, item_id: int, item_update: schemas.itens_venda.ItemVendaUpdate, db: Session = Depends(get_db)):
+@router.put("/{venda_id}/itens/{item_venda_id}")
+def update_item_venda(venda_id: int, item_venda_id: int, item_update: schemas.itens_venda.ItemVendaUpdate, db: Session = Depends(get_db)):
     item_venda = db.query(models.ItemVenda).filter(
-        models.ItemVenda.item_id == item_id,
+        models.ItemVenda.item_venda_id == item_venda_id,
         models.ItemVenda.venda_id == venda_id
     ).first()
 
@@ -77,10 +77,10 @@ def update_item_venda(venda_id: int, item_id: int, item_update: schemas.itens_ve
     return {"message": "Item de venda atualizado com sucesso."}
 
 
-@router.delete("/{venda_id}/itens/{item_id}")
-def delete_item_venda(venda_id: int, item_id: int, db: Session = Depends(get_db)):
+@router.delete("/{venda_id}/itens/{item_venda_id}")
+def delete_item_venda(venda_id: int, item_venda_id: int, db: Session = Depends(get_db)):
     item_venda = db.query(models.ItemVenda).filter(
-        models.ItemVenda.item_id == item_id,
+        models.ItemVenda.item_venda_id == item_venda_id,
         models.ItemVenda.venda_id == venda_id
     ).first()
 

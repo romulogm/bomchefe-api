@@ -4,6 +4,7 @@ from typing import Optional, List
 from .produtos import Produto
 from .movimentacao_estoque import MovimentacaoEstoque
 from .feiras import Feira
+from .itens_venda import ItemVendaResponseSchema
 
 
 class EstoqueBase(BaseModel):
@@ -22,6 +23,7 @@ class EstoqueCreate(EstoqueBase):
 class Estoque(EstoqueBase):
     estoque_id: int
     produto: Optional[Produto] = None
-    # feira_onde_alocado: Optional[Feira]
+    feira: Optional[Feira]
     movimentacoes_estoque: Optional[List[MovimentacaoEstoque]] = None
+    vendas_associadas_a_este_estoque: Optional[List[ItemVendaResponseSchema]] = None
     model_config = ConfigDict(from_attributes=True)
