@@ -27,3 +27,19 @@ class Estoque(EstoqueBase):
     movimentacoes_estoque: Optional[List[MovimentacaoEstoque]] = None
     vendas_associadas_a_este_estoque: Optional[List[ItemVendaResponseSchema]] = None
     model_config = ConfigDict(from_attributes=True)
+
+class MovimentarEstoqueParaFeiraPayload(BaseModel):
+    produto_id: int
+    quantidade_a_mover: int = Field(..., gt=0)
+    feira_id_destino: int
+
+    
+class MovimentarEstoqueResponse(BaseModel):
+    message: str
+    estoque_sede_id_atualizado: int
+    estoque_sede_nova_quantidade: int
+    novo_estoque_feira_id_criado: int
+    novo_estoque_feira_quantidade: int
+    
+    class Config:
+        orm_mode = True
