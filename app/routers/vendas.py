@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app import crud, schemas, models
 from app.database import get_db
@@ -101,3 +101,34 @@ def delete_item_venda(venda_id: int, item_venda_id: int, db: Session = Depends(g
         db.commit()
 
     return {"message": "Item de venda removido com sucesso."}
+
+@router.post(
+    "/consolidar/", 
+    response_model=schemas.ConsolidarVendaResponse,
+    summary="Consolida uma Feira a partir de uma Venda",
+    description="Acionado por um ID de venda, consolida toda a feira associada, retornando o estoque não vendido para a Sede."
+)
+def consolidar_venda(
+    payload: schemas.ConsolidarVendaPayload, 
+    db: Session = Depends(get_db)
+):
+    """
+    Endpoint para consolidar as operações de uma feira a partir de uma venda:
+
+    - **Usa** o `venda_id` para identificar a feira a ser consolidada.
+    - **Verifica** se a feira já foi consolidada para evitar duplicidade.
+    - **Retorna** o estoque não vendido para a Sede.
+    - **Registra** todas as movimentações de estoque.
+    - **Marca** o estoque da feira como consolidado.
+    - **Retorna** um resumo detalhado da operação, incluindo produtos vendidos e retornados.
+    """
+    try:
+        resultado = crud.vendas.consolidar_venda_e_retornar_estoque(db=db, venda_id=payload.venda_id)
+        return resultado
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Um erro inesperado ocorreu no servidor: {str(e)}"
+        )

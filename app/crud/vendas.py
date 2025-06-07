@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session, joinedload, selectinload
+from sqlalchemy import func
 from fastapi import HTTPException, status
 from datetime import datetime
 from .. import models, schemas
@@ -274,138 +275,121 @@ def delete_venda(db: Session, venda_id: int) -> models.Venda | None:
             detail=f"Ocorreu um erro ao tentar deletar a venda: {str(e)}"
         )
     
-    # O objeto db_venda está agora desanexado e marcado como deletado.
-    # Retorná-lo pode ser útil para confirmar a deleção, mas ele não estará mais na sessão.
     return db_venda
-# from sqlalchemy.orm import Session, joinedload, selectinload # Importe joinedload e selectinload
-# from .. import models, schemas
 
-# def get_vendas(db: Session, skip: int = 0, limit: int = 100) -> list[schemas.Venda]:
-#     """
-#     Retorna uma lista de vendas, carregando os relacionamentos 'feira', 'itens_venda',
-#     e o 'produto' de cada item através do estoque.
-#     """
-#     return db.query(models.Venda)\
-#              .options(
-#                  joinedload(models.Venda.feira), # Carrega os dados da feira
-#                  selectinload(models.Venda.itens_venda) # Carrega a lista de itens_venda
-#                      .joinedload(models.ItemVenda.item_de_estoque_utilizado) # A partir de ItemVenda, carrega o Estoque
-#                      .joinedload(models.Estoque.produto) # A partir de Estoque, carrega o Produto
-#              )\
-#              .offset(skip)\
-#              .limit(limit)\
-#              .all()
-
-# def get_venda(db: Session, venda_id: int) -> schemas.Venda | None:
-#     """
-#     Retorna uma venda específica pelo ID, carregando os relacionamentos 'feira', 'itens_venda',
-#     e o 'produto' de cada item através do estoque.
-#     """
-#     return db.query(models.Venda)\
-#              .options(
-#                  joinedload(models.Venda.feira), # Carrega os dados da feira
-#                  selectinload(models.Venda.itens_venda) # Carrega a lista de itens_venda
-#                      .joinedload(models.ItemVenda.item_de_estoque_utilizado) # A partir de ItemVenda, carrega o Estoque
-#                      .joinedload(models.Estoque.produto) # A partir de Estoque, carrega o Produto
-#              )\
-#              .filter(models.Venda.venda_id == venda_id)\
-#              .first()
-
-# def create_venda(db: Session, venda_data: schemas.VendaCreate) -> schemas.Venda:
-#     """
-#     Cria uma nova venda e seus itens associados no banco de dados em uma única transação.
-#     O campo 'feira_id' é opcional e será incluído se presente no objeto 'venda_data'.
-#     """
+def consolidar_venda_e_retornar_estoque(db: Session, venda_id: int) -> dict:
+    """
+    Consolida as vendas e o estoque de uma feira a partir de uma venda de referência, retornando o que não foi vendido para a Sede.
+    """
     
-#     # 1. Prepara o dicionário para criar a Venda, excluindo os itens por enquanto
-#     venda_dict = venda_data.model_dump(exclude={'itens_venda'}) 
+    # 1. Valida a venda de referência e obtém a feira_id
+    venda_referencia = db.query(models.Venda).options(joinedload(models.Venda.feira)).filter(models.Venda.venda_id == venda_id).first()
+    if not venda_referencia:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Venda com ID {venda_id} não encontrada.")
     
-#     db_venda = models.Venda(**venda_dict) 
+    if not venda_referencia.feira_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=f"A Venda com ID {venda_id} não está associada a nenhuma feira e não pode ser usada para consolidação."
+        )
     
-#     db.add(db_venda)
-    
-#     # 2. Força o SQLAlchemy a executar a inserção da Venda para obter o venda_id
-#     # Isso é crucial antes de adicionar os itens de venda.
-#     db.flush() 
+    feira_id = venda_referencia.feira_id
+    feira = venda_referencia.feira
 
-#     # 3. Itera sobre os itens de venda fornecidos e os adiciona à sessão
-#     if venda_data.itens_venda: # Verifica se há itens para adicionar
-#         for item_data in venda_data.itens_venda:
-#             # Use .model_dump() para Pydantic v2+, ou .dict() para Pydantic v1
-#             # Mapeia os campos do schema ItemVendaCreate para o modelo ItemVenda
-#             db_item_venda = models.ItemVenda(
-#                 venda_id=db_venda.venda_id, # Usa o ID da venda recém-criada
-#                 estoque_id=item_data.estoque_id, # Do schema ItemVendaCreate
-#                 quantidade=item_data.quantidade, # Do schema ItemVendaCreate
-#                 preco_unitario=item_data.preco_unitario # Do schema ItemVendaCreate
-#             )
-#             db.add(db_item_venda)
-    
-#     # 4. Comita todas as alterações (venda e itens) de uma vez
-#     db.commit()
-    
-#     # 5. Atualiza o objeto db_venda para refletir os itens recém-adicionados
-#     # e outros dados gerados pelo banco (como data_venda se default=datetime.utcnow)
-#     db.refresh(db_venda)
+    # 2. Verifica se esta feira já foi consolidada para evitar duplicidade
+    estoque_ja_consolidado = db.query(models.Estoque).filter(
+        models.Estoque.feira_id == feira_id,
+        models.Estoque.venda_consolidada == True
+    ).first()
+    if estoque_ja_consolidado:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, 
+            detail=f"A Feira com ID {feira_id} (associada à Venda {venda_id}) já foi consolidada anteriormente."
+        )
 
-#     # 6. Carrega os relacionamentos para que o objeto retornado inclua feira e itens_venda com seus produtos
-#     # Isso garante que a resposta da API contenha os dados completos
-#     # É importante buscar novamente ou garantir que a sessão tenha os dados carregados.
-#     # Uma forma segura é buscar novamente o objeto com os options desejados.
-#     venda_completa = db.query(models.Venda)\
-#                        .options(
-#                            joinedload(models.Venda.feira),
-#                            selectinload(models.Venda.itens_venda)
-#                                .joinedload(models.ItemVenda.item_de_estoque_utilizado)
-#                                .joinedload(models.Estoque.produto)
-#                        )\
-#                        .filter(models.Venda.venda_id == db_venda.venda_id)\
-#                        .first()
+    # 3. Busca e totaliza os produtos vendidos na feira
+    itens_vendidos_query = db.query(
+        models.Produto.produto_id,
+        models.Produto.nome,
+        func.sum(models.ItemVenda.quantidade).label("quantidade_total_vendida"),
+        func.sum(models.ItemVenda.quantidade * models.ItemVenda.preco_unitario).label("valor_total_arrecadado")
+    ).select_from(models.Venda).join(
+        models.ItemVenda, models.Venda.venda_id == models.ItemVenda.venda_id
+    ).join(
+        models.Estoque, models.ItemVenda.estoque_id == models.Estoque.estoque_id
+    ).join(
+        models.Produto, models.Estoque.produto_id == models.Produto.produto_id
+    ).filter(
+        models.Venda.feira_id == feira_id
+    ).group_by(
+        models.Produto.produto_id,
+        models.Produto.nome
+    ).all()
 
-#     return venda_completa
+    produtos_vendidos_info = [
+        {
+            "produto_id": row.produto_id,
+            "nome_produto": row.nome,
+            "quantidade_total_vendida": row.quantidade_total_vendida or 0,
+            "valor_total_arrecadado": float(row.valor_total_arrecadado or 0.0)
+        } for row in itens_vendidos_query
+    ]
 
-# def update_venda(db: Session, venda_id: int, venda_data: schemas.VendaUpdate) -> schemas.Venda | None: # Alterado para VendaUpdate
-#     """
-#     Atualiza uma venda existente no banco de dados.
-#     A atualização de itens de venda é mais complexa e não está totalmente implementada aqui.
-#     Esta função focará em atualizar os campos diretos da Venda.
-#     """
-#     db_venda = db.query(models.Venda).filter(models.Venda.venda_id == venda_id).first()
-#     if db_venda:
-#         # Atualiza os campos diretos da Venda
-#         # Use .model_dump(exclude_unset=True) para Pydantic v2+ para permitir atualizações parciais
-#         update_data = venda_data.model_dump(exclude_unset=True, exclude={'itens_venda'}) 
-#         for key, value in update_data.items():
-#             setattr(db_venda, key, value)
+    # 4. Processa o retorno do estoque não vendido
+    estoques_a_retornar = db.query(models.Estoque)\
+        .join(models.Estoque.produto)\
+        .filter(
+            models.Estoque.feira_id == feira_id,
+            models.Estoque.quantidade > 0
+        ).with_for_update().all()
+
+    produtos_retornados_info = []
+    for estoque_feira in estoques_a_retornar:
+        quantidade_a_retornar = estoque_feira.quantidade
+        produto_id = estoque_feira.produto_id
+
+        estoque_sede = db.query(models.Estoque).filter(
+            models.Estoque.produto_id == produto_id,
+            models.Estoque.feira_id.is_(None),
+            models.Estoque.localizacao == "Sede"
+        ).with_for_update().first()
+
+        if not estoque_sede:
+            estoque_sede = models.Estoque(produto_id=produto_id, quantidade=0, localizacao="Sede", data_atualizacao=datetime.utcnow())
+            db.add(estoque_sede)
+            db.flush()
         
-#         # AVISO: A lógica para atualizar 'itens_venda' é mais complexa.
-#         # Se 'venda_data.itens_venda' for fornecido, você precisaria implementar
-#         # uma lógica para adicionar/remover/atualizar itens.
-#         # Por simplicidade, esta parte é omitida.
+        mov_saida_feira = models.MovimentacaoEstoque(produto_id=produto_id, estoque_id=estoque_feira.estoque_id, quantidade_alterada=-quantidade_a_retornar, tipo_movimentacao='RETORNO_DE_FEIRA_SAIDA', feira_id=feira_id, observacao=f"Retorno de {quantidade_a_retornar} unidades da feira '{feira.nome}' para a Sede.")
+        db.add(mov_saida_feira)
 
-#         db.commit()
-#         db.refresh(db_venda)
+        mov_entrada_sede = models.MovimentacaoEstoque(produto_id=produto_id, estoque_id=estoque_sede.estoque_id, quantidade_alterada=quantidade_a_retornar, tipo_movimentacao='RETORNO_DE_FEIRA_ENTRADA', feira_id=feira_id, observacao=f"Entrada de {quantidade_a_retornar} unidades na Sede, da feira '{feira.nome}'.")
+        db.add(mov_entrada_sede)
+
+        estoque_sede.quantidade += quantidade_a_retornar
+        estoque_sede.data_atualizacao = datetime.utcnow()
+        estoque_feira.quantidade = 0
+        estoque_feira.data_atualizacao = datetime.utcnow()
         
-#         # Recarrega com relacionamentos para a resposta
-#         venda_atualizada_completa = db.query(models.Venda)\
-#                                    .options(
-#                                        joinedload(models.Venda.feira),
-#                                        selectinload(models.Venda.itens_venda)
-#                                            .joinedload(models.ItemVenda.item_de_estoque_utilizado)
-#                                            .joinedload(models.Estoque.produto)
-#                                    )\
-#                                    .filter(models.Venda.venda_id == db_venda.venda_id)\
-#                                    .first()
-#         return venda_atualizada_completa
-#     return None # Retorna None se a venda não for encontrada
+        produtos_retornados_info.append({
+            "produto_id": produto_id, "nome_produto": estoque_feira.produto.nome, "quantidade_retornada": quantidade_a_retornar,
+            "estoque_feira_id_zerado": estoque_feira.estoque_id, "estoque_sede_id_atualizado": estoque_sede.estoque_id,
+            "nova_quantidade_sede": estoque_sede.quantidade
+        })
 
-# def delete_venda(db: Session, venda_id: int) -> models.Venda | None:
-#     """
-#     Deleta uma venda existente e, devido ao cascade="all, delete-orphan",
-#     também deleta seus itens de venda associados.
-#     """
-#     db_venda = db.query(models.Venda).filter(models.Venda.venda_id == venda_id).first()
-#     if db_venda:
-#         db.delete(db_venda)
-#         db.commit()
-#     return db_venda
+    # 5. Marca TODOS os itens de estoque da feira como consolidados
+    db.query(models.Estoque)\
+        .filter(models.Estoque.feira_id == feira_id)\
+        .update({"venda_consolidada": True}, synchronize_session=False)
+
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Ocorreu um erro ao consolidar a feira: {str(e)}")
+    
+    return {
+        "message": f"Estoque da feira ID {feira_id} consolidado e retornado para a Sede com sucesso.",
+        "feira_id": feira_id,
+        "produtos_vendidos": produtos_vendidos_info,
+        "produtos_retornados": produtos_retornados_info
+    }

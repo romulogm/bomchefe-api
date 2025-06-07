@@ -5,43 +5,23 @@ from typing import List, Optional
 from .feiras import Feira
 from.itens_venda import ItemVendaBase, ItemVendaCreate
 
-# class ItemVendaBase(BaseModel):
-
-#     estoque_id: int
-#     quantidade: int
-#     preco_unitario: Decimal
-
-#     model_config = ConfigDict(from_attributes=True)
-
-# class ItemVendaCreate(BaseModel): 
-#     estoque_id: int
-#     quantidade: int
-#     preco_unitario: Decimal
-
-#     model_config = ConfigDict(from_attributes=True)
-
 
 class VendaBase(BaseModel):
 
     cliente_id: Optional[int] = None
-    valor_total: Decimal # Atenção: Este campo é tipicamente calculado.
-    status_venda: str = "Concluída" # Default conforme sua definição
+    valor_total: Decimal 
+    status_venda: str = "Concluída" 
     feira_id: Optional[int] = None
 
 class VendaCreate(VendaBase):
-
-    # Se você usar ItemVendaCreate para os itens na criação:
-    # itens_venda: List[ItemVendaCreate] = []
-    # Conforme sua definição original, usando ItemVendaBase:
     itens_venda: List[ItemVendaCreate] = Field(default_factory=list)
-    # 'valor_total' em VendaBase será o valor enviado pelo cliente.
-    # A lógica de negócios deve validar ou recalcular isso com base nos itens.
 
-class Venda(VendaBase): # Schema para respostas da API
+
+class Venda(VendaBase):
 
     venda_id: int
     data_venda: datetime
-    itens_venda: List[ItemVendaBase] = Field(default_factory=list) # Ou um schema ItemVendaResponse mais detalhado
+    itens_venda: List[ItemVendaBase] = Field(default_factory=list) 
     feira: Optional[Feira] = None
 
     model_config = ConfigDict(from_attributes=True)
@@ -52,7 +32,33 @@ class VendaUpdate(BaseModel):
     valor_total: Optional[Decimal] = None 
     status_venda: Optional[str] = None
     feira_id: Optional[int] = None
-    
     itens_venda: Optional[List[ItemVendaBase]] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+class ConsolidarVendaPayload(BaseModel):
+    """Payload para solicitar a consolidação de uma feira a partir de uma venda."""
+    venda_id: int = Field(..., description="ID da venda que aciona a consolidação da feira associada.")
+
+class ProdutoVendido(BaseModel):
+    """Descreve um produto que foi vendido na feira."""
+    produto_id: int
+    nome_produto: str
+    quantidade_total_vendida: int
+    valor_total_arrecadado: float
+
+class ProdutoRetornado(BaseModel):
+    """Descreve um produto cujo estoque foi retornado da feira para a sede."""
+    produto_id: int
+    nome_produto: str
+    quantidade_retornada: float
+    estoque_feira_id_zerado: int
+    estoque_sede_id_atualizado: int
+    nova_quantidade_sede: float
+
+class ConsolidarVendaResponse(BaseModel):
+    """Resposta detalhada da operação de consolidação da feira."""
+    message: str
+    feira_id: int
+    produtos_vendidos: List[ProdutoVendido]
+    produtos_retornados: List[ProdutoRetornado]

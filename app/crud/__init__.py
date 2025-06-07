@@ -28,6 +28,7 @@ from .vendas import (
     create_venda,
     update_venda,
     delete_venda,
+    consolidar_venda_e_retornar_estoque,
 )
 
 from .feiras import (

@@ -7,19 +7,12 @@ class ItemVenda(Base):
 
     item_venda_id = Column(Integer, primary_key=True, index=True)
     venda_id = Column(Integer, ForeignKey("vendas.venda_id"), nullable=False)
-    
-    # Chave estrangeira para a tabela Estoque
-    # Indica de qual item de estoque específico este item de venda foi retirado.
     estoque_id = Column(Integer, ForeignKey("estoque.estoque_id"), nullable=False)
-    
     quantidade = Column(Integer, nullable=False)
-    # É uma boa prática registrar o preço unitário no momento da venda, 
-    # pois os preços dos produtos podem mudar.
     preco_unitario = Column(Numeric(10, 2), nullable=False)
-
     # Relacionamento de volta para Venda (já definido no seu modelo Venda)
     venda = relationship("Venda", back_populates="itens_venda")
-    
+
     # Relacionamento com Estoque: cada item de venda vem de um item de estoque.
     # "item_de_estoque_utilizado" será o atributo em ItemVenda para acessar o Estoque.
     # "vendas_associadas_a_este_estoque" será o atributo em Estoque para acessar os ItensVenda.
