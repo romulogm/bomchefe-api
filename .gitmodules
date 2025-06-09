@@ -1,0 +1,3 @@
+[submodule "app-frontend/biscoitos-bom-chefe"]
+	path = app-frontend/biscoitos-bom-chefe
+	url = https://github.com/luizhrubiolicosta/biscoitos-bom-chefe.git
