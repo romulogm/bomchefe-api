@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app import crud, schemas, models
 from app.database import get_db
+from app.utils.auth import verify_token
 
-router = APIRouter()
+
+router = APIRouter(dependencies=[Depends(verify_token)])
 
 @router.get("/", response_model=list[schemas.Venda])
 def get_vendas(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):

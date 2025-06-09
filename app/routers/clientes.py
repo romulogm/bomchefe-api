@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app import crud, schemas
 from app.database import get_db
+from app.utils.auth import verify_token
 
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(verify_token)])
 
 @router.get("/", response_model=list[schemas.Cliente])
 def get_clientes(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):

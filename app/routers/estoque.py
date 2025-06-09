@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
+from app.utils.auth import verify_token
+
 from sqlalchemy.exc import IntegrityError
 # Removido ForeignKeyViolation pois o handler genérico de IntegrityError é melhor
 # from psycopg2.errors import ForeignKeyViolation # Específico do psycopg2
@@ -7,7 +9,7 @@ from app import crud, schemas, models
 from app.database import get_db
 from pydantic import BaseModel, Field # Adicionado para os novos schemas
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(verify_token)])
 
 @router.get("/", response_model=list[schemas.Estoque]) # Usando MovimentarMovimentarEstoqueResponse do seu schema
 def get_estoques_endpoint(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
@@ -94,7 +96,35 @@ def list_estoque_by_produto_endpoint(produto_id: int, db: Session = Depends(get_
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhum estoque encontrado para este produto.")
     return estoques
 
-# --- NOVO ENDPOINT ---
+@router.get("/estoque-por-feira/", response_model=schemas.estoque.Estoque, summary="Busca um estoque específico")
+def buscar_estoque_por_feira_e_produto(
+    # Define feira_id como um parâmetro de consulta obrigatório
+    feira_id: int = Query(..., description="ID da feira para filtrar o estoque"),
+    # Define produto_id como um parâmetro de consulta obrigatório
+    produto_id: int = Query(..., description="ID do produto para filtrar o estoque"),
+    db: Session = Depends(get_db)
+):
+    """
+    Busca e retorna um item de estoque específico baseado na combinação
+    única de uma feira e um produto.
+    """
+    # A consulta agora filtra por ambos os campos, feira_id e produto_id
+    estoque = db.query(models.Estoque).filter(
+        models.Estoque.feira_id == feira_id,
+        models.Estoque.produto_id == produto_id
+    ).first() # Usamos .first() pois esperamos apenas um resultado
+
+    # Se nenhum estoque for encontrado, retorna um erro 404
+    if not estoque:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Estoque não encontrado para a feira e produto informados."
+        )
+    
+    # Retorna o item de estoque encontrado
+    return estoque
+
+
 @router.post("/movimentar-para-feira/", response_model=schemas.MovimentarEstoqueResponse, status_code=status.HTTP_200_OK)
 def movimentar_estoque_para_feira_endpoint(
     payload: schemas.MovimentarEstoqueParaFeiraPayload, 

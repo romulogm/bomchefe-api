@@ -6,7 +6,9 @@ from jinja2 import Template
 from app.utils.auth import verify_token
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(dependencies=[Depends(verify_token)])
+app = FastAPI(
+            root_path="/api"
+            )
 
 
 origins = [

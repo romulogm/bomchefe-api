@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-
+from app.utils.auth import verify_token
 from .. import crud, schemas, models
 from ..database import get_db
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(verify_token)])
 
 @router.post("/", response_model=schemas.Feira, status_code=status.HTTP_201_CREATED)
 def create_feira(feira_payload: schemas.FeiraCreate, db: Session = Depends(get_db)):
