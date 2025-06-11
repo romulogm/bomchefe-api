@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from decimal import Decimal
 from datetime import date
 
@@ -17,5 +17,13 @@ class ProdutoCreate(ProdutoBase):
 class Produto(ProdutoBase):
     produto_id: int
 
-    class Config:
-        orm_mode = True
+    ConfigDict(from_attributes=True)
+
+class ProdutoSchema(BaseModel):
+    """
+    Schema para representar a informação essencial de um produto na resposta da API.
+    """
+    produto_id: int
+    nome: str
+
+    model_config = ConfigDict(from_attributes=True)

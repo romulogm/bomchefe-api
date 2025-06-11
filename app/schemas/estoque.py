@@ -1,10 +1,10 @@
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import date, datetime
 from typing import Optional, List
-from .produtos import Produto
+from .produtos import Produto, ProdutoSchema
 from .movimentacao_estoque import MovimentacaoEstoque
 from .feiras import Feira
-from .itens_venda import ItemVendaResponseSchema
+
 
 
 class EstoqueBase(BaseModel):
@@ -25,7 +25,7 @@ class Estoque(EstoqueBase):
     produto: Optional[Produto] = None
     feira: Optional[Feira]
     movimentacoes_estoque: Optional[List[MovimentacaoEstoque]] = None
-    vendas_associadas_a_este_estoque: Optional[List[ItemVendaResponseSchema]] = None
+    vendas_associadas_a_este_estoque: Optional[List['ItemVendaResponseSchema']] = None
     model_config = ConfigDict(from_attributes=True)
 
 class MovimentarEstoqueParaFeiraPayload(BaseModel):
@@ -41,5 +41,18 @@ class MovimentarEstoqueResponse(BaseModel):
     novo_estoque_feira_id_criado: int
     novo_estoque_feira_quantidade: int
     
-    class Config:
-        orm_mode = True
+    ConfigDict(from_attributes=True)
+
+class EstoqueComProdutoSchema(BaseModel):
+    """
+    Schema para o Estoque que expõe o Produto aninhado.
+    Usado na resposta detalhada do ItemVenda.
+    """
+    estoque_id: int
+    produto: ProdutoSchema
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+from .itens_venda import ItemVendaResponseSchema
+Estoque.model_rebuild()

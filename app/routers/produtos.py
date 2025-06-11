@@ -3,12 +3,25 @@ from sqlalchemy.orm import Session
 from app import crud, schemas
 from app.database import get_db
 from app.utils.auth import verify_token
+from typing import List, Optional
 
 router = APIRouter(dependencies=[Depends(verify_token)])
 
-@router.get("/", response_model=list[schemas.Produto])
-def get_produtos(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
-    return crud.get_produtos(db=db, skip=skip, limit=limit)
+@router.get("/", response_model=List[schemas.Produto])
+def listar_produtos(
+    skip: int = 0,
+    limit: int = 100,
+    feira_id: Optional[int] = None, 
+    db: Session = Depends(get_db)
+):
+    """
+    Lista produtos. Filtra por feira se `feira_id` for fornecido.
+    - Ex: /produtos
+    - Ex: /produtos?feira_id=3
+    """
+    # A variável feira_id é passada para a função CRUD
+    produtos = crud.produto.get_produtos(db=db, skip=skip, limit=limit, feira_id=feira_id)
+    return produtos
 
 @router.get("/{produto_id}", response_model=schemas.Produto)
 def get_produto(produto_id: int, db: Session = Depends(get_db)):

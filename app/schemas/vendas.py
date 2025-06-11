@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 from .feiras import Feira
-from.itens_venda import ItemVendaBase, ItemVendaCreate
+from .itens_venda import ItemVendaBase, ItemVendaCreate, ItemVendaDetalhadoSchema 
 
 
 class VendaBase(BaseModel):
@@ -16,18 +16,15 @@ class VendaBase(BaseModel):
 class VendaCreate(VendaBase):
     itens_venda: List[ItemVendaCreate] = Field(default_factory=list)
 
-
 class Venda(VendaBase):
-
     venda_id: int
     data_venda: datetime
-    itens_venda: List[ItemVendaBase] = Field(default_factory=list) 
+    itens_venda: List[ItemVendaDetalhadoSchema] = Field(default_factory=list) 
     feira: Optional[Feira] = None
 
     model_config = ConfigDict(from_attributes=True)
 
 class VendaUpdate(BaseModel):
-
     cliente_id: Optional[int] = None
     valor_total: Optional[Decimal] = None 
     status_venda: Optional[str] = None
