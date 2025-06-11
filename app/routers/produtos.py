@@ -20,7 +20,7 @@ def listar_produtos(
     - Ex: /produtos?feira_id=3
     """
     # A variável feira_id é passada para a função CRUD
-    produtos = crud.produto.get_produtos(db=db, skip=skip, limit=limit, feira_id=feira_id)
+    produtos = crud.produtos.get_produtos(db=db, skip=skip, limit=limit, feira_id=feira_id)
     return produtos
 
 @router.get("/{produto_id}", response_model=schemas.Produto)
