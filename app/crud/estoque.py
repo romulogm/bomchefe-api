@@ -17,15 +17,39 @@ def get_estoques(db: Session, skip: int = 0, limit: int = 100):
              .all()
 
 def create_estoque(db: Session, estoque_data: schemas.EstoqueCreate) -> models.Estoque:
+    """
+    Cria um novo item de estoque.
+
+    Antes de criar, verifica se já existe um estoque para o mesmo produto na "Sede".
+    Se já existir, impede a criação de um novo para evitar duplicidade.
+    """
+
+
+    if estoque_data.localizacao == "Sede":
+        estoque_existente_na_sede = db.query(models.Estoque).filter(
+            models.Estoque.produto_id == estoque_data.produto_id,
+            models.Estoque.localizacao == "Sede"
+        ).first()
+
+      
+        if estoque_existente_na_sede:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, 
+                detail=f"Já existe um estoque para o produto ID {estoque_data.produto_id} na Sede. Não é permitido criar um novo."
+            )
+   
+
+
+    
     db_estoque = models.Estoque(**estoque_data.model_dump())
     db.add(db_estoque)
-    db.flush() # Para obter estoque_id antes de criar a movimentação
+    db.flush() 
 
     movimentacao = models.MovimentacaoEstoque(
         produto_id=db_estoque.produto_id,
         estoque_id=db_estoque.estoque_id,
         quantidade_alterada=db_estoque.quantidade,
-        tipo_movimentacao="ENTRADA_INICIAL_ESTOQUE", # Mais específico
+        tipo_movimentacao="ENTRADA_INICIAL_ESTOQUE", 
         feira_id=db_estoque.feira_id,
         observacao="Registo inicial de estoque criado.",
     )
@@ -120,7 +144,6 @@ def delete_estoque(db: Session, estoque_id: int) -> models.Estoque | None:
         return db_estoque 
     return None
 
-# --- FUNÇÃO ATUALIZADA ---
 def movimentar_estoque_para_feira(
     db: Session, 
     payload: schemas.MovimentarEstoqueParaFeiraPayload # Usando o schema Pydantic para o payload
