@@ -41,7 +41,7 @@ def create_estoque(db: Session, estoque_data: schemas.EstoqueCreate) -> models.E
     # --- INÍCIO DA ALTERAÇÃO ---
 
     dados_para_db = estoque_data.model_dump()
-    if dados_para_db.get("feira_id") == 0:
+    if dados_para_db.get("localizacao") == "Sede":
         dados_para_db["feira_id"] = None
 
     db_estoque = models.Estoque(**dados_para_db)    
