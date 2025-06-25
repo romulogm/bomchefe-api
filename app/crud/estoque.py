@@ -38,10 +38,16 @@ def create_estoque(db: Session, estoque_data: schemas.EstoqueCreate) -> models.E
                 detail=f"Já existe um estoque para o produto ID {estoque_data.produto_id} na Sede. Não é permitido criar um novo."
             )
    
+    # --- INÍCIO DA ALTERAÇÃO ---
 
+    dados_para_db = estoque_data.model_dump()
+    if dados_para_db.get("feira_id") == 0:
+        dados_para_db["feira_id"] = None
 
-    
-    db_estoque = models.Estoque(**estoque_data.model_dump())
+    db_estoque = models.Estoque(**dados_para_db)    
+
+    # --- FIM DA ALTERAÇÃO ---  
+
     db.add(db_estoque)
     db.flush() 
 
